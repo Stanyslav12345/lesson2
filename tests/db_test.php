@@ -1,7 +1,9 @@
 <?php
-require_once __DIR__ . '/../App/Db.php';
-require_once __DIR__ . '/../App/Model.php';
-require_once __DIR__ . '/../App/Article.php';
+
+require __DIR__ . '/../App/autoload.php';
+
+use App\Db;
+use App\Models\Article;
 
 echo '<h3>Поиск новостей с id от -5 до 20:</h3>';
 $articles = [];
@@ -39,10 +41,30 @@ foreach ($articles as $article) {
 }
 
 echo '<h3>Попытка замены поля времени на букву Х</h3>';
-foreach ($articles as $article){
+foreach ($articles as $article) {
     var_dump($db->execute('UPDATE articles SET createDate = :c_date WHERE id=:id', [
         ':c_date' => 'Х',
         ':id' => $article->id
     ]));
     echo '<br>';
+}
+
+echo '<h3>Ищем последние 2 новости</h3>';
+foreach (Article::findLast(2) as $article) {
+    echo $article->header . '<br>';
+}
+
+echo '<h3>Ищем последние 0 новости</h3>';
+foreach (Article::findLast(0) as $article) {
+    echo $article->header . '<br>';
+}
+
+echo '<h3>Ищем последние -2 новости</h3>';
+foreach (Article::findLast(0) as $article) {
+    echo $article->header . '<br>';
+}
+
+echo '<h3>Ищем последние 100 новости</h3>';
+foreach (Article::findLast(100) as $article) {
+    echo $article->header . '<br>';
 }

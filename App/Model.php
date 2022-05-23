@@ -1,6 +1,8 @@
 <?php
 
 
+namespace App;
+
 abstract class Model
 {
     public int $id;
@@ -17,16 +19,28 @@ abstract class Model
         );
     }
 
-    public static function findById($id): Model | false
+    public static function findById($id): Model|false
     {
         $db = new Db();
         return $db->query(
             //на тот странный случай, если id не уникален, ввожу лимит, чтобы в пустую не грузить базу
-            'SELECT * FROM ' . static::$table . ' WHERE id=:id LIMIT 1',
-            [':id'=>$id],
-            static::class
-        // если фетч вернул пустой массив, а с 8.0 он возвращает его вместо false, то заменяем нулевой индекс на false
-        )[0] ?? false;
+                'SELECT * FROM ' . static::$table . ' WHERE id=:id LIMIT 1',
+                [':id' => $id],
+                static::class
+            // если фетч вернул пустой массив, а с 8.0 он возвращает его вместо false, то заменяем нулевой индекс на false
+            )[0] ?? false;
     }
 
+    public static function findLast(int $lastNum = 1): array
+    {
+        if ($lastNum < 1) {
+            return [];
+        }
+
+        $db = new Db();
+        return $db->query(
+            'SELECT * FROM ' . static::$table . ' ORDER BY id DESC LIMIT ' . $lastNum,
+            [],
+            static::class);
+    }
 }

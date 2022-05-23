@@ -1,9 +1,9 @@
 <?php
 
-require_once __DIR__.'/App/Db.php';
-require_once  __DIR__.'/App/Model.php';
-require_once  __DIR__.'/App/Article.php';
+use App\Models\Article;
 
-$lastNews = Article::getLast(3);
-include __DIR__.'/Templates/news.php';
+require __DIR__ . '/App/autoload.php';
+
+$lastNews = Article::findLast(3);
+include __DIR__ . '/Templates/news.php';
 
