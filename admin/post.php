@@ -11,7 +11,7 @@ function queryErr(){
 
 $scenario = $_POST['scenario'] ?? null;
 
-if ($scenario == null) {
+if (null === $scenario) {
     queryErr();
 }
 
@@ -34,7 +34,7 @@ switch ($scenario) {
     case 'deleteArticle':
         $articleId = $_POST['articleId'] ?? null;
 
-        if ($articleId == null){
+        if (null === $articleId){
             queryErr();
         }
 

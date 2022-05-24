@@ -11,7 +11,7 @@ abstract class Model
 
     public function update()
     {
-        if ($this->id === null) {
+        if (null === $this->id) {
             return;
         }
 
@@ -59,7 +59,7 @@ abstract class Model
         }
 
         $modelFromDb = static::findById($this->id);
-        if ($modelFromDb === false) {
+        if (false === $modelFromDb) {
             $this->insert();
         } else {
             $this->update();
