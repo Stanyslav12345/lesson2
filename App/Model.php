@@ -9,6 +9,75 @@ abstract class Model
 
     protected static string $table = '';
 
+    public function update()
+    {
+        if ($this->id === null) {
+            return;
+        }
+
+        $sets = [];
+        $data = [];
+        foreach (get_object_vars($this) as $prop => $value) {
+            $data[':' . $prop] = $value;
+            if ('id' == $prop) {
+                continue;
+            }
+            $sets[] = $prop . '=:' . $prop;
+
+        }
+
+        $sql = 'UPDATE ' . static::$table . ' SET ' . implode(',', $sets) . ' WHERE id=:id';
+        $db = new Db();
+        $db->execute($sql, $data);
+    }
+
+    public function insert()
+    {
+        $columns = [];
+        $data = [];
+        foreach (get_object_vars($this) as $prop => $value) {
+            if ('id' == $prop) {
+                continue;
+            }
+            $data[':' . $prop] = $value;
+            $columns[] = $prop;
+        }
+
+        $sql = 'INSERT INTO ' . static::$table . '(' . implode(',', $columns) . ') 
+        VALUES (' . implode(',', array_keys($data)) . ')';
+
+        $db = new Db();
+        $db->execute($sql, $data);
+
+        $this->id = $db->getLastId();
+    }
+
+    public function save()
+    {
+        if (!isset($this->id) || null === $this->id) {
+            $this->insert();
+        }
+
+        $modelFromDb = static::findById($this->id);
+        if ($modelFromDb === false) {
+            $this->insert();
+        } else {
+            $this->update();
+        }
+    }
+
+    public function delete()
+    {
+        if (null === $this->id) {
+            return;
+        }
+
+        $sql = 'DELETE FROM ' . static::$table . ' WHERE id=:id';
+        $data[':id'] = $this->id;
+        $db = new Db();
+        $db->execute($sql, $data);
+    }
+
     public static function findAll(): array
     {
         $db = new Db();

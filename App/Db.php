@@ -14,12 +14,14 @@ class Db
 
     public function __construct()
     {
-        $config = (include __DIR__ . '/config.php')['db'];
-        $this->dbh = new PDO(
-            'mysql:host=' . $config['host'] . ';dbname=' . $config['dbname'],
-            $config['user'],
-            $config['password']
-        );
+        $config = Config::getConfig();
+
+        $host = $config->data['db']['host'];
+        $dbName = $config->data['db']['dbname'];
+        $user = $config->data['db']['user'];
+        $password = $config->data['db']['password'];
+
+        $this->dbh = new PDO('mysql:host=' . $host . ';dbname=' . $dbName, $user, $password);
     }
 
     public function query(string $sql, array $params = [], string $class = stdClass::class): array
@@ -33,8 +35,6 @@ class Db
     public function execute(string $query, $params = []): bool
     {
         $sth = $this->dbh->prepare($query);
-        //execute по документам в случае ошибки должен возвращать fasle, но возвращает ошибку,
-        //поэтому пришлось городить try-catch
         try {
             $result = $sth->execute($params);
         } catch (Exception) {
@@ -42,5 +42,10 @@ class Db
         }
 
         return $result;
+    }
+
+    public function getLastId(): string
+    {
+        return $this->dbh->lastInsertId();
     }
 }
